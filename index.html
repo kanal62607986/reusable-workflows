@@ -1,13 +1,340 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="/src/assets/images/original.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OctoMatch by OctoGames — Octodex Memory Game</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Kanal 6 - Feel The Sound</title>
+    
+    <link rel="icon" type="image/png" href="image_2.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #08080a;
+            --bg-panel: #111114;
+            --accent-red: #ff3344;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border-color: #1f1f23;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
+
+        /* SIDEBAR */
+        .sidebar { width: 260px; background-color: var(--bg-dark); border-right: 1px solid var(--border-color); padding: 40px 25px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+        .main-logo { width: 100%; max-width: 180px; margin: 0 auto 50px auto; display: block; }
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-item { margin-bottom: 15px; }
+        .nav-link { color: var(--text-muted); text-decoration: none; display: flex; align-items: center; padding: 12px 18px; border-radius: 8px; transition: 0.3s; font-size: 14px; font-weight: 600; }
+        .nav-link i { margin-right: 15px; width: 20px; font-size: 16px; }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255, 51, 68, 0.1); color: var(--accent-red); }
+        .social-links { display: flex; justify-content: space-around; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--text-muted); }
+
+        /* MAIN CONTENT */
+        .main-content { margin-left: 260px; flex-grow: 1; padding: 30px 60px; background: radial-gradient(circle at top right, #1a1a20 0%, var(--bg-dark) 60%); }
+        
+        /* GORNJA TRAKA */
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .live-indicator { background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 8px 20px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 10px; }
+        .live-dot { width: 8px; height: 8px; background-color: var(--accent-red); border-radius: 50%; box-shadow: 0 0 10px var(--accent-red); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* HERO */
+        .hero-section { margin-bottom: 50px; position: relative; }
+        .hero-title { font-size: 72px; font-weight: 800; line-height: 1; margin-bottom: 15px; letter-spacing: -2px; }
+        .hero-title span { color: var(--accent-red); }
+        .hero-subtitle { color: var(--text-muted); font-size: 16px; max-width: 500px; line-height: 1.6; }
+        .headphone-bg { position: absolute; right: -100px; top: -50px; width: 600px; opacity: 0.2; z-index: -1; } /* placeholder za veliku sliku slusalica */
+
+        /* PLEJER KARTICA */
+        .player-card { background-color: var(--bg-panel); border: 1px solid rgba(255,51,68,0.2); border-radius: 16px; padding: 30px; display: flex; align-items: center; gap: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); margin-bottom: 60px; }
+        .player-logo-circle { width: 120px; height: 120px; flex-shrink: 0; }
+        .player-info { flex-grow: 1; }
+        .player-info h3 { font-size: 28px; margin-bottom: 5px; }
+        .player-info p { color: var(--text-muted); font-size: 14px; }
+        .stream-link { font-family: monospace; font-size: 12px; color: #555; background: #000; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 10px; }
+        .player-controls { display: flex; align-items: center; gap: 25px; color: var(--text-muted); font-size: 18px; }
+        .btn-play { width: 64px; height: 64px; background-color: var(--accent-red); border-radius: 50%; border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 0 25px rgba(255,51,68,0.5); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .btn-play:hover { transform: scale(1.05); }
+
+        /* SEKCIJE NASLOVI */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .section-header h2 { font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
+        .view-all { color: var(--accent-red); text-decoration: none; font-size: 14px; font-weight: 600; }
+
+        /* VESTI I PLAYLISTA GRID */
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-bottom: 60px; }
+        .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .news-card { background-color: var(--bg-panel); border-radius: 12px; border: 1px solid var(--border-color); padding: 15px; transition: 0.3s; cursor: pointer; }
+        .news-card:hover { border-color: var(--accent-red); transform: translateY(-5px); }
+        .news-img { width: 100%; height: 160px; background-color: #1a1a1a; border-radius: 8px; margin-bottom: 15px; }
+        .news-tag { background-color: var(--accent-red); font-size: 10px; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; font-weight: 700; }
+        .news-card h4 { margin: 12px 0 8px 0; font-size: 15px; line-height: 1.4; }
+        .news-date { color: var(--text-muted); font-size: 11px; margin-bottom: 10px; display: block; }
+        .news-card p { color: var(--text-muted); font-size: 12px; line-height: 1.5; height: 3.6em; overflow: hidden; }
+
+        /* PLAYLISTA */
+        .playlist-panel { background-color: var(--bg-panel); border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; }
+        .playlist-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+        .playlist-item:last-child { border-bottom: none; }
+        .song-number { font-size: 18px; font-weight: 800; color: var(--text-muted); width: 25px; text-align: center; }
+        .song-cover { width: 45px; height: 45px; background-color: #1a1a1a; border-radius: 6px; }
+        .song-info { flex-grow: 1; }
+        .song-info h5 { font-size: 14px; margin-bottom: 2px; }
+        .song-info span { font-size: 12px; color: var(--text-muted); }
+        .song-stats { display: flex; align-items: center; gap: 15px; color: var(--text-muted); font-size: 12px; }
+        .song-stats i.fa-heart { color: var(--accent-red); }
+
+        /* STANICE GRID */
+        .stations-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 25px; margin-bottom: 80px; }
+        .station-card { background-color: var(--bg-panel); border-radius: 16px; border: 1px solid var(--border-color); padding: 40px 20px; text-align: center; transition: 0.3s; cursor: pointer; position: relative;}
+        .station-card:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-5px); }
+        .station-card.active { border-color: var(--accent-red); box-shadow: 0 0 30px rgba(255,51,68,0.2); }
+        .station-logo { width: 130px; height: 130px; margin: 0 auto 25px auto; display: block; }
+        .station-card h4 { font-size: 16px; text-transform: uppercase; margin-bottom: 8px; }
+        .station-card p { font-size: 12px; color: var(--text-muted); }
+        .station-card.active p { color: var(--accent-red); font-weight: 600; }
+        .btn-play-mini { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; border: none; opacity: 0; transition: 0.3s;}
+        .station-card:hover .btn-play-mini { opacity: 1; bottom: 25px;}
+        .station-card.active .btn-play-mini { background: var(--accent-red); opacity: 1;}
+
+        /* FOOTER */
+        .main-footer { border-top: 1px solid var(--border-color); padding: 60px 0 30px 0; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; font-size: 13px; color: var(--text-muted); }
+        .footer-logo { width: 150px; margin-bottom: 20px; }
+        .footer-col h5 { color: var(--text-main); text-transform: uppercase; margin-bottom: 20px; font-size: 14px; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 12px; }
+        .footer-col ul a { color: var(--text-muted); text-decoration: none; transition: 0.3s; }
+        .footer-col ul a:hover { color: var(--text-main); }
+        .contact-item { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .contact-item i { color: var(--accent-red); width: 16px; text-align: center;}
+        .copyright { text-align: center; color: #444; font-size: 11px; margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <img src="image_5.png" alt="Radio Kanal 6 Logo" class="main-logo">
+        
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-solid fa-house"></i> POČETNA</a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fa-regular fa-newspaper"></i> VESTI</a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-list-ul"></i> PLAYLISTA</a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-tower-broadcast"></i> STANICE</a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fa-regular fa-user"></i> O NAMA</a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fa-regular fa-envelope"></i> KONTAKT</a></li>
+        </ul>
+        
+        <div class="social-links">
+            <i class="fa-brands fa-facebook-f"></i>
+            <i class="fa-brands fa-instagram"></i>
+            <i class="fa-brands fa-youtube"></i>
+            <i class="fa-brands fa-soundcloud"></i>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="top-header">
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                UŽIVO: Radio Kanal 6 - Feel The Sound
+            </div>
+            <div style="display:flex; gap: 20px; color: var(--text-muted); cursor: pointer;">
+                <i class="fa-solid fa-moon"></i>
+                <i class="fa-solid fa-bars"></i>
+            </div>
+        </header>
+
+        <section class="hero-section">
+            <h1 class="hero-title">RADIO<br><span>KANAL 6</span></h1>
+            <p class="hero-subtitle">Tvoj zvuk. Tvoj ritam. Tvoj kanal.<br>24/7 najbolja muzika, bez prekida.</p>
+            </section>
+
+        <section class="player-card">
+            <img src="image_2.png" alt="Kanal 6 Mini Logo" class="player-logo-circle">
+            
+            <div class="player-info">
+                <div class="live-indicator" style="display:inline-flex; border:none; padding:0; background:transparent; margin-bottom:5px;">
+                    <div class="live-dot"></div> UŽIVO
+                </div>
+                <h3>Radio Kanal 6</h3>
+                <p>Feel The Sound</p>
+                <span class="stream-link">https://stream.zeno.fm/am9tx02cashvv</span>
+            </div>
+            
+            <div class="player-controls">
+                <i class="fa-solid fa-volume-high"></i>
+                <i class="fa-solid fa-backward-step"></i>
+                <button class="btn-play"><i class="fa-solid fa-pause"></i></button>
+                <i class="fa-solid fa-forward-step"></i>
+                <i class="fa-solid fa-ellipsis"></i>
+                <i class="fa-regular fa-heart" style="margin-left: 20px;"></i>
+            </div>
+        </section>
+
+        <div class="content-grid">
+            
+            <div>
+                <div class="section-header">
+                    <h2>NAJNOVIJE VESTI</h2>
+                    <a href="#" class="view-all">Pogledaj sve →</a>
+                </div>
+                <div class="news-grid">
+                    <div class="news-card">
+                        <div class="news-img"></div> <span class="news-tag">VESTI</span>
+                        <h4>Daft Punk se vraćaju? Novi album na pomolu</h4>
+                        <span class="news-date">24. maj 2024.</span>
+                        <p>Prema najnovijim informacijama, legendarni duo sprema novi materijal...</p>
+                    </div>
+                    <div class="news-card">
+                        <div class="news-img"></div>
+                        <span class="news-tag" style="background:#ff9900">FESTIVALI</span>
+                        <h4>EXIT Festival 2024 objavio line-up!</h4>
+                        <span class="news-date">20. maj 2024.</span>
+                        <p>Više od 100 izvođača stiže na Petrovaradinsku tvrđavu...</p>
+                    </div>
+                    <div class="news-card">
+                        <div class="news-img"></div>
+                        <span class="news-tag" style="background:#33cc33">MUZIKA</span>
+                        <h4>The Weeknd najavio novi album</h4>
+                        <span class="news-date">18. maj 2024.</span>
+                        <p>"Hurry Up Tomorrow" izlazi 31. januara 2025...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-header">
+                    <h2>PLAYLISTA ZA GLASANJE</h2>
+                    <a href="#" class="view-all">Pogledaj sve →</a>
+                </div>
+                <div class="playlist-panel">
+                    <div class="playlist-item">
+                        <span class="song-number">1</span>
+                        <div class="song-cover"></div>
+                        <div class="song-info">
+                            <h5>Blinding Lights</h5>
+                            <span>The Weeknd</span>
+                        </div>
+                        <div class="song-stats">
+                            <span><i class="fa-solid fa-heart"></i> 124</span>
+                            <i class="fa-regular fa-thumbs-up"></i>
+                        </div>
+                    </div>
+                    <div class="playlist-item">
+                        <span class="song-number">2</span>
+                        <div class="song-cover"></div>
+                        <div class="song-info">
+                            <h5>Feel It Still</h5>
+                            <span>Portugal. The Man</span>
+                        </div>
+                        <div class="song-stats">
+                            <span><i class="fa-solid fa-heart"></i> 98</span>
+                            <i class="fa-regular fa-thumbs-up"></i>
+                        </div>
+                    </div>
+                    <div class="playlist-item">
+                        <span class="song-number">3</span>
+                        <div class="song-cover"></div>
+                        <div class="song-info">
+                            <h5>Don't Start Now</h5>
+                            <span>Dua Lipa</span>
+                        </div>
+                        <div class="song-stats">
+                            <span><i class="fa-solid fa-heart"></i> 86</span>
+                            <i class="fa-regular fa-thumbs-up"></i>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-muted);">
+                        Tvoj glas čini razliku! <i class="fa-solid fa-bolt" style="color: var(--accent-red);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <div class="section-header">
+                <h2>NAŠE STANICE</h2>
+            </div>
+            <div class="stations-grid">
+                
+                <div class="station-card active">
+                    <img src="image_5.png" alt="Radio Kanal 6" class="station-logo">
+                    <h4>RADIO KANAL 6</h4>
+                    <p>Feel The Sound</p>
+                    <p style="font-size: 11px; margin-top: 5px;">Pop • Hit • Mix</p>
+                    <button class="btn-play-mini"><i class="fa-solid fa-pause"></i></button>
+                </div>
+
+                <div class="station-card">
+                    <img src="image_3.png" alt="Chill Out" class="station-logo">
+                    <p style="margin-top: 15px;">Lounge • Chill • Relax</p>
+                    <button class="btn-play-mini"><i class="fa-solid fa-play"></i></button>
+                </div>
+
+                <div class="station-card">
+                    <img src="image_4.png" alt="Deep House" class="station-logo">
+                    <p style="margin-top: 15px;">Deep • House • Groovy</p>
+                    <button class="btn-play-mini"><i class="fa-solid fa-play"></i></button>
+                </div>
+
+                <div class="station-card">
+                    <img src="image_6.png" alt="Only Real Hits" class="station-logo">
+                    <p style="margin-top: 15px;">Pop • Dance • Chart</p>
+                    <button class="btn-play-mini"><i class="fa-solid fa-play"></i></button>
+                </div>
+
+                <div class="station-card">
+                    <img src="image_7.png" alt="Rock and Roll" class="station-logo">
+                    <p style="margin-top: 15px;">Rock • Classic • Legends</p>
+                    <button class="btn-play-mini"><i class="fa-solid fa-play"></i></button>
+                </div>
+
+            </div>
+        </section>
+
+        <footer class="main-footer">
+            <div class="footer-col">
+                <img src="image_5.png" alt="Logo Footer" class="footer-logo">
+                <p>Ne prestajemo sa muzikom.<br>Ne prestajemo sa vama.<br>24/7. Svuda.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h5>LINKOVI</h5>
+                <ul>
+                    <li><a href="#">Početna</a></li>
+                    <li><a href="#">Vesti</a></li>
+                    <li><a href="#">Playlista</a></li>
+                    <li><a href="#">Stanice</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h5>PRATITE NAS</h5>
+                <ul>
+                    <li><a href="#"><i class="fa-brands fa-instagram"></i> Instagram</a></li>
+                    <li><a href="#"><i class="fa-brands fa-facebook"></i> Facebook</a></li>
+                    <li><a href="#"><i class="fa-brands fa-youtube"></i> YouTube</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h5>KONTAKT</h5>
+                <div class="contact-item"><i class="fa-solid fa-envelope"></i> info@kanal6radio.com</div>
+                <div class="contact-item"><i class="fa-solid fa-phone"></i> +381 60 123 4567</div>
+                <div class="contact-item"><i class="fa-solid fa-location-dot"></i> Beograd, Srbija</div>
+            </div>
+        </footer>
+        
+        <div class="copyright">
+            © 2024 Radio Kanal 6. Sva prava zadržana. | Designed with ❤️ for music lovers.
+        </div>
+
+    </main>
+</body>
 </html>
